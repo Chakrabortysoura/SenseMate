@@ -1,4 +1,7 @@
+import os
+import requests
 from kivy.app import App
+from kivy.core.clipboard.clipboard_android import PythonActivity
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image as widget_image
@@ -6,7 +9,6 @@ from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 import cv2
-import os
 import datetime
 from androidstorage4kivy import SharedStorage
 from jnius import autoclass
@@ -68,10 +70,32 @@ class SenseMate(App):
     def save_image(self, instance):
         """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
         try:
-            src_image="6826.png"
-            ss=SharedStorage()
-            target_filename=self.timestamp_filename()
-            ss.copy_to_shared(src_image, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
+            # src_image="6826.png"
+            # ss=SharedStorage()
+            # target_filename=self.timestamp_filename()
+            # ss.copy_to_shared(src_image, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
+
+            image_url="http://192.168.166.191/"
+            Context=autoclass("android.content.Context")
+            PythonActivity=autoclass("org.kivy.android.PythonActivity")
+            app_context=PythonActivity.mActivity.getApplicationContext()
+            private_dir=app_context.getFilesDir().getAbsolutePath()
+
+            os.makedirs(private_dir, exist_ok=True)
+
+            save_path=os.path.join(private_dir, "downloaded_image.jpg")
+
+            response=requests.get(image_url, stream=True)
+            if response.status_code==200:
+                with open(save_path, "wb") as file:
+                    for chunk in response.iter_content(1024):
+                        file.write(chunk)
+                print("Image save private at: ",save_path)
+                ss=SharedStorage()
+                ss.copy_to_shared(save_path, filepath="/storage/emulated/0/Download/"+self.timestamp_filename())
+
+            else:
+                print("Failed to download the image")
 
         except Exception as e:
             print(f"Error saving image: {e}")
