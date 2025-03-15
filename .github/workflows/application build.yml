@@ -1,0 +1,14 @@
+name : Android Application Build Process
+run-name : Application building is starting
+on : [push]
+jobs: 
+  Setup-python-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: 
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r Android_application/requirements.txt
+      - run: echo "python installation was successfull"
