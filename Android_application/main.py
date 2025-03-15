@@ -1,13 +1,12 @@
 import os
 import requests
 from kivy.app import App
-from kivy.core.clipboard.clipboard_android import PythonActivity
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image as widget_image
 from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
+from kivy.uix.gridlayout import GridLayout
 import cv2
 import datetime
 from androidstorage4kivy import SharedStorage
@@ -35,13 +34,13 @@ class SenseMate(App):
         )
         self.window.add_widget(self.txt)
 
-        self.txt_input = TextInput(
-            hint_text="Placeholder text....."
-        )
-        self.window.add_widget(self.txt_input)
+        # self.txt_input = TextInput(
+        #     hint_text="Placeholder text....."
+        # )
+        # self.window.add_widget(self.txt_input)
 
         self.scan_button = Button(
-            text="SAVE IMAGE",
+            text="TAKE AN IMAGE",
             size_hint=(1, 0.5),
             bold=True,
             background_color='#EA6191'
@@ -75,7 +74,7 @@ class SenseMate(App):
             # target_filename=self.timestamp_filename()
             # ss.copy_to_shared(src_image, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
 
-            image_url="http://192.168.166.191/"
+            image_url="http://192.168.228.191/"
             Context=autoclass("android.content.Context")
             PythonActivity=autoclass("org.kivy.android.PythonActivity")
             app_context=PythonActivity.mActivity.getApplicationContext()
@@ -92,7 +91,7 @@ class SenseMate(App):
                         file.write(chunk)
                 print("Image save private at: ",save_path)
                 ss=SharedStorage()
-                ss.copy_to_shared(save_path, filepath="/storage/emulated/0/Download/"+self.timestamp_filename())
+                ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
 
             else:
                 print("Failed to download the image")
