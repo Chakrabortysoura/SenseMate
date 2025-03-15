@@ -17,5 +17,6 @@ jobs:
       - run: echo "apt dependencies are installed"
       - run: cd Android_application/
       - run: echo "Buildozer build process is starting"
+      - run: PATH=$PATH:~/.local/bin
       - run: buildozer -v android debug
       - run: echo "Build ended"
