@@ -1,0 +1,9 @@
+name : Android Application Build Process
+run-name : Application building is starting
+on : [push]
+jobs: 
+  Setup-python-env:
+    runs-on: ubuntu-latest
+    steps:
+      - run: apt install python3.12
+      - run: echo "python installation was successfull"
