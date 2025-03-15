@@ -11,4 +11,4 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
       - run: pip install -r Android_application/requirement.txt
-      - run: echo "python installation was successfull"
+      - run: echo "python installation and virtuaenv setup was successfull"
