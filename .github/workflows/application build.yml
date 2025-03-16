@@ -4,8 +4,7 @@ on : [push]
 jobs: 
   Setup-python-env:
     runs-on: ubuntu-latest
-    steps:
-      - name: python installation
+    steps: 
       - run: sudo add-apt-repository ppa:deadsnakes/ppa
       - run: sudo apt update
       - run: sudo apt install python3.12
