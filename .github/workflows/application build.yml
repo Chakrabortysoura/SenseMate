@@ -7,7 +7,8 @@ jobs:
     steps: 
        - uses: actions/checkout@v4.2.2
          with: 
-           sparse-checkout : Android_application 
+           sparse-checkout : |
+             Android_application 
        - uses: actions/setup-python@v5
          with: 
            python-version: '3.12'
