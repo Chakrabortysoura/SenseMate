@@ -5,9 +5,8 @@ jobs:
   Setup-python-env:
     runs-on: ubuntu-latest
     steps: 
-      - run: sudo add-apt-repository ppa:deadsnakes/ppa
-      - run: sudo apt update
-      - run: sudo apt install python3.12
-      - uses: actions/checkout@v4.2.2
-      - run: virtualenv -p /usr/bin/python3.12 project
-      - run: pip install -r requirements.txt
+       - uses: actions/checkout@v4.2.2
+       - uses: actions/setup-python@v5
+         with: 
+           python-version:'3.12'
+       - run: sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
