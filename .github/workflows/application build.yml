@@ -5,19 +5,8 @@ jobs:
   Setup-python-env:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: 
-          python-version: '3.12'
-      - run: pip list
-      - run: echo "python installation and virtuaenv setup was successfull"
-      - run: sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
-      - run: wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
-      - run: sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
-      - run: echo "apt dependencies are installed"
-      - run: cd Android_application/
-      - run: echo "Buildozer build process is starting"
-      - run: pip install --user --upgrade buildozer==1.5.0 Cython==3.0.12 
-      - run: export PATH=$PATH:~/.local/bin
-      - run: buildozer -v android debug
-      - run: echo "Build ended"
+      - name: python installation
+      - run: sudo add-apt-repository ppa:deadsnakes/ppa
+      - run: sudo apt update
+      - run: sudo apt install python3.12
+      
