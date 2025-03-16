@@ -23,4 +23,4 @@ jobs:
            python3.12 -m venv project
            source project/bin/activate
            pip install -r requirements.txt
-           buildozer -v android debug
+           yes | buildozer -v android debug
