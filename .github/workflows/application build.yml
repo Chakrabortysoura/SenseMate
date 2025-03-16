@@ -8,4 +8,6 @@ jobs:
       - run: sudo add-apt-repository ppa:deadsnakes/ppa
       - run: sudo apt update
       - run: sudo apt install python3.12
-      
+      - uses: actions/checkout@v4.2.2
+      - run: virtualenv -p /usr/bin/python3.12 project
+      - run: pip install -r requirements.txt
