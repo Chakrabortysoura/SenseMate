@@ -12,6 +12,8 @@ jobs:
        - run: sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
        - run: wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
        - run: sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
+       - run: cd Android_application/
        - run: python3.12 -m venv project
        - run: source project/bin/activate
        - run: pip install -r requirements.txt
+       - run: buildozer -v android debug
