@@ -9,6 +9,7 @@ jobs:
          with: 
            sparse-checkout : |
              Android_application 
+           sparse-checkout-cone-mode: false
        - uses: actions/setup-python@v5
          with: 
            python-version: '3.12'
