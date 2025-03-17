@@ -42,4 +42,5 @@ toml==0.10.2
 typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0
+uvicorn==0.34.0
 virtualenv==20.29.2
