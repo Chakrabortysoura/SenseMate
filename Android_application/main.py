@@ -7,12 +7,11 @@ from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
-import cv2
 import datetime
-from androidstorage4kivy import SharedStorage
 from jnius import autoclass
 if platform == "android":
     from android.permissions import request_permissions, Permission
+    from androidstorage4kivy import SharedStorage
 class SenseMate(App):
 
     def build(self):
@@ -34,10 +33,10 @@ class SenseMate(App):
         )
         self.window.add_widget(self.txt)
 
-        # self.txt_input = TextInput(
-        #     hint_text="Placeholder text....."
-        # )
-        # self.window.add_widget(self.txt_input)
+        self.txt_input = TextInput(
+            hint_text="Give IP address of the ESP"
+        )
+        self.window.add_widget(self.txt_input)
 
         self.scan_button = Button(
             text="TAKE AN IMAGE",
@@ -68,36 +67,26 @@ class SenseMate(App):
 
     def save_image(self, instance):
         """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
-        try:
-            # src_image="6826.png"
-            # ss=SharedStorage()
-            # target_filename=self.timestamp_filename()
-            # ss.copy_to_shared(src_image, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
-
-            image_url="http://192.168.228.191/"
-            Context=autoclass("android.content.Context")
-            PythonActivity=autoclass("org.kivy.android.PythonActivity")
-            app_context=PythonActivity.mActivity.getApplicationContext()
-            private_dir=app_context.getFilesDir().getAbsolutePath()
-
-            os.makedirs(private_dir, exist_ok=True)
-
-            save_path=os.path.join(private_dir, "downloaded_image.jpg")
-
-            response=requests.get(image_url, stream=True)
-            if response.status_code==200:
-                with open(save_path, "wb") as file:
-                    for chunk in response.iter_content(1024):
-                        file.write(chunk)
-                print("Image save private at: ",save_path)
-                ss=SharedStorage()
-                ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
-
-            else:
-                print("Failed to download the image")
-
-        except Exception as e:
-            print(f"Error saving image: {e}")
+        image_url=self.txt_input.text
+        print("Url pointing to the esp32: ", image_url)
+        if platform == "android":
+            try:
+                pythonActivity=autoclass("org.kivy.android.PythonActivity")
+                app_context=pythonActivity.mActivity.getApplicationContext()
+                private_dir=app_context.getFilesDir().getAbsolutePath()
+                os.makedirs(private_dir, exist_ok=True)
+                save_path=os.path.join(private_dir, "downloaded_image.jpg")
+                response=requests.get(image_url, stream=True)
+                if response.status_code==200:
+                    with open(save_path, "wb") as file:
+                        for chunk in response.iter_content(1024):
+                            file.write(chunk)
+                    ss=SharedStorage()
+                    ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/"+self.timestamp_filename())
+                else:
+                    print("Failed to download the image with a response status code : ", response.status_code)
+            except Exception as e:
+                print(f"Error saving image: {e}")
 
 if __name__ == "__main__":
     SenseMate().run()
