@@ -12,7 +12,11 @@ This project's objective is to design a iot based smart accessory that can be wo
 
 1. ESP-32 CAM Module
 2. Buck Converter
-3. Rechargable AA batteries 
+3. Rechargable 18650 batteries Li ion batteries
+4. TP4056 cgarging ckt
+
+## case holder
+
 
 
 ## Face Detection Methodology
