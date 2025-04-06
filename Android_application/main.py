@@ -178,5 +178,5 @@ class SenseMate(App):
 
 if __name__ == "__main__":
     SenseMate().run()
-
+    
 # Just a point to be noted is that when the IP address is being put over here, it does not get an image in that IP, so it just loads and it continues, which I think can be overcomed once the camera is connected.
