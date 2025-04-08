@@ -67,8 +67,9 @@ class SenseMate(App):
 
     def save_image(self, instance):
         """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
-        image_url=self.txt_input.text
+        image_url="http://"+self.txt_input.text
         print("Url pointing to the esp32: ", image_url)
+        print("type: ", type(image_url))
         if platform == "android":
             try:
                 pythonActivity=autoclass("org.kivy.android.PythonActivity")
