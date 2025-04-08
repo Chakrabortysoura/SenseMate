@@ -1,71 +1,149 @@
 import os
 import requests
+import datetime
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.image import Image as widget_image
 from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-import datetime
-from jnius import autoclass
+from kivy.uix.modalview import ModalView
+from kivy.animation import Animation
+from kivy.clock import Clock
+from kivy.uix.popup import Popup
+from kivy.uix.floatlayout import FloatLayout
+
 if platform == "android":
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
+    from jnius import autoclass
+
 class SenseMate(App):
 
     def build(self):
         self.window = GridLayout()
         self.window.cols = 1
-        self.window.size_hint = (0.6, 0.7)
+        self.window.size_hint = (0.8, 0.9)
         self.window.pos_hint = {"center_x": 0.5, "center_y": 0.5}
-        self.window.color = '#0F0F0F'
-        # add widgets to window
 
-        # image widget
+        # Robotic Background Theme
+        self.window.canvas.before.clear()
+        with self.window.canvas.before:
+            from kivy.graphics import Color, Rectangle
+            Color(0.05, 0.07, 0.1, 1)
+            self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
+            self.window.bind(pos=self.update_bg, size=self.update_bg)
+
         self.window.add_widget(widget_image(source="sensemate.png"))
 
-        # label widget
-        self.txt = Label(
-            text=" All pictures captured are stored in /Downloads/SenseMate/",
-            font_size=20,
-            color='#EA6191'
+        input_box = BoxLayout(
+            orientation='vertical',
+            size_hint=(0.9, None),
+            height=60,
+            pos_hint={'center_x': 0.5, 'center_y': 0.65},
+            padding=[10, 10],
+            spacing=5
         )
-        self.window.add_widget(self.txt)
 
         self.txt_input = TextInput(
-            hint_text="Give IP address of the ESP"
+            hint_text="Enter IP address of the ESP",
+            size_hint=(1, 1),
+            font_size='18sp',
+            halign="center",
+            background_color=[1, 1, 1, 1],
+            foreground_color=[0, 0, 0, 1],
         )
-        self.window.add_widget(self.txt_input)
+
+        input_box.add_widget(self.txt_input)
+        self.window.add_widget(input_box)
 
         self.scan_button = Button(
             text="TAKE AN IMAGE",
-            size_hint=(1, 0.5),
+            size_hint=(0.9, 0.15),
+            pos_hint={'center_x': 0.5, 'center_y': 0.55},
             bold=True,
-            background_color='#EA6191'
-
+            background_color=(0.2, 0.8, 1, 1),
+            color=(1, 1, 1, 1),
+            font_size=18
         )
         self.scan_button.bind(on_press=self.save_image)
         self.window.add_widget(self.scan_button)
-        # Request permissions on Android
+
+        self.gallery_button = Button(
+            text="VIEW GALLERY",
+            size_hint=(1, 0.15),
+            bold=True,
+            background_color=(0.2, 0.7, 0.3, 1),
+            color=(1, 1, 1, 1),
+            font_size=18
+        )
+        self.window.add_widget(self.gallery_button)
+
         if platform == "android":
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
 
         return self.window
 
-    def timestamp_filename(self):
-        """"Create timestamped name for the current image to be saved"""
-        current_time=str(datetime.datetime.now())
-        return current_time[:current_time.rindex('.')].replace(' ','_')+".jpg"
+    def update_bg(self, instance, value):
+        self.bg_rect.pos = instance.pos
+        self.bg_rect.size = instance.size
 
-    def scan_file(self, file_path):
-        """ Notify the media scanner to make the file visible in the gallery """
-        MediaScannerConnection = autoclass('android.media.MediaScannerConnection')
-        Uri = autoclass('android.net.Uri')
-        context = autoclass('org.kivy.android.PythonActivity').mActivity.getApplicationContext()
-        MediaScannerConnection.scanFile(context, [file_path], None, None)
+    def timestamp_filename(self):
+        current_time = datetime.datetime.now()
+        return current_time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
+
+    def get_current_timestamp(self):
+        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def show_loading_popup(self, message="Processing..."):
+        self.loading_popup = Popup(
+            title='Please Wait',
+            content=Label(text=message, font_size='16sp', color=[1, 1, 1, 1]),
+            size_hint=(None, None),
+            size=(300, 150),
+            auto_dismiss=False,
+            background_color=(0.1, 0.1, 0.1, 0.9)
+        )
+        self.loading_popup.open()
+
+    def hide_loading_popup(self):
+        if hasattr(self, 'loading_popup') and self.loading_popup:
+            self.loading_popup.dismiss()
+
+    def show_notification(self, message):
+        layout = FloatLayout()
+        notif_label = Label(
+            text=message,
+            font_size='16sp',
+            size_hint=(None, None),
+            size=(300, 150),
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            color=(1, 1, 1, 1)
+        )
+        layout.add_widget(notif_label)
+
+        popup = Popup(
+            title='Notification',
+            content=layout,
+            size_hint=(None, None),
+            size=(350, 180),
+            background_color=(0.1, 0.1, 0.1, 0.9),
+            auto_dismiss=False
+        )
+
+        anim = Animation(opacity=0, duration=0.5)
+        popup.open()
+
+        def dismiss_popup(*args):
+            anim.start(popup)
+            Clock.schedule_once(lambda dt: popup.dismiss(), 0.5)
+
+        Clock.schedule_once(dismiss_popup, 2.5)
 
     def save_image(self, instance):
+<<<<<<< HEAD
         """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
         image_url="http://"+self.txt_input.text
         print("Url pointing to the esp32: ", image_url)
@@ -88,6 +166,42 @@ class SenseMate(App):
                     print("Failed to download the image with a response status code : ", response.status_code)
             except Exception as e:
                 print(f"Error saving image: {e}")
+=======
+        image_url = self.txt_input.text.strip()
+        if not image_url:
+            self.show_notification("Enter a valid ESP IP address!")
+            return
+
+        self.show_notification("Capturing image...\n" + self.get_current_timestamp())
+        self.show_loading_popup("Capturing image from ESP...")
+
+        def do_download(*args):
+            if platform == "android":
+                try:
+                    pythonActivity = autoclass("org.kivy.android.PythonActivity")
+                    app_context = pythonActivity.mActivity.getApplicationContext()
+                    private_dir = app_context.getFilesDir().getAbsolutePath()
+                    os.makedirs(private_dir, exist_ok=True)
+                    save_path = os.path.join(private_dir, "downloaded_image.jpg")
+                    response = requests.get(image_url, stream=True)
+                    if response.status_code == 200:
+                        with open(save_path, "wb") as file:
+                            for chunk in response.iter_content(1024):
+                                file.write(chunk)
+                        ss = SharedStorage()
+                        ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                        self.show_notification("Image saved successfully!\n" + self.get_current_timestamp())
+                    else:
+                        self.show_notification("Failed to download image. Check ESP.")
+                except Exception as e:
+                    self.show_notification(f"Error: {str(e)}")
+                finally:
+                    Clock.schedule_once(lambda dt: self.hide_loading_popup(), 0.1)
+
+        Clock.schedule_once(do_download, 0.5)
+>>>>>>> 72fe9242f6f6bb90e12e8378f78bfff9395ff0a5
 
 if __name__ == "__main__":
     SenseMate().run()
+    
+# Just a point to be noted is that when the IP address is being put over here, it does not get an image in that IP, so it just loads and it continues, which I think can be overcomed once the camera is connected.
