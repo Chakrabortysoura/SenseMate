@@ -143,7 +143,6 @@ class SenseMate(App):
         Clock.schedule_once(dismiss_popup, 2.5)
 
     def save_image(self, instance):
-<<<<<<< HEAD
         """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
         image_url="http://"+self.txt_input.text
         print("Url pointing to the esp32: ", image_url)
@@ -166,7 +165,6 @@ class SenseMate(App):
                     print("Failed to download the image with a response status code : ", response.status_code)
             except Exception as e:
                 print(f"Error saving image: {e}")
-=======
         image_url = self.txt_input.text.strip()
         if not image_url:
             self.show_notification("Enter a valid ESP IP address!")
@@ -175,33 +173,5 @@ class SenseMate(App):
         self.show_notification("Capturing image...\n" + self.get_current_timestamp())
         self.show_loading_popup("Capturing image from ESP...")
 
-        def do_download(*args):
-            if platform == "android":
-                try:
-                    pythonActivity = autoclass("org.kivy.android.PythonActivity")
-                    app_context = pythonActivity.mActivity.getApplicationContext()
-                    private_dir = app_context.getFilesDir().getAbsolutePath()
-                    os.makedirs(private_dir, exist_ok=True)
-                    save_path = os.path.join(private_dir, "downloaded_image.jpg")
-                    response = requests.get(image_url, stream=True)
-                    if response.status_code == 200:
-                        with open(save_path, "wb") as file:
-                            for chunk in response.iter_content(1024):
-                                file.write(chunk)
-                        ss = SharedStorage()
-                        ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
-                        self.show_notification("Image saved successfully!\n" + self.get_current_timestamp())
-                    else:
-                        self.show_notification("Failed to download image. Check ESP.")
-                except Exception as e:
-                    self.show_notification(f"Error: {str(e)}")
-                finally:
-                    Clock.schedule_once(lambda dt: self.hide_loading_popup(), 0.1)
-
-        Clock.schedule_once(do_download, 0.5)
->>>>>>> 72fe9242f6f6bb90e12e8378f78bfff9395ff0a5
-
 if __name__ == "__main__":
     SenseMate().run()
-    
-# Just a point to be noted is that when the IP address is being put over here, it does not get an image in that IP, so it just loads and it continues, which I think can be overcomed once the camera is connected.
