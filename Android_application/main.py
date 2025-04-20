@@ -19,7 +19,7 @@ if platform == "android":
 class SenseMate(App):
 
     def build(self):
-        self.window = GridLayout(cols=1, size_hint=(0.8, 0.9), pos_hint={"center_x": 0.5, "center_y": 0.5})
+        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5})
 
         # Robotic Theme Background
         self.window.canvas.before.clear()
@@ -32,8 +32,8 @@ class SenseMate(App):
         self.window.add_widget(widget_image(source="sensemate.png"))
 
         # IP Input
-        input_box = BoxLayout(orientation='vertical', size_hint=(0.9, None), height=100, pos_hint={'center_x': 0.5, },
-                              padding=[10, 10], spacing=5)
+        input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5, },
+                              padding=[50, 10], spacing=5)
 
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
                                    font_size='18sp', halign="center",
@@ -42,7 +42,7 @@ class SenseMate(App):
         self.window.add_widget(input_box)
 
         # Take Image Button
-        self.scan_button = Button(text="TAKE AN IMAGE", size_hint=(0.9, 0.15),
+        self.scan_button = Button(text="TAKE AN IMAGE", size_hint=(0.5, 0.15),
                                   pos_hint={'center_x': 0.5}, bold=True,
                                   background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
         self.scan_button.bind(on_press=self.save_image)
