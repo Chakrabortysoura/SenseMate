@@ -32,7 +32,7 @@ class SenseMate(App):
         self.window.add_widget(widget_image(source="sensemate.png"))
 
         # IP Input
-        input_box = BoxLayout(orientation='vertical', size_hint=(0.9, None), height=60, pos_hint={'center_x': 0.5},
+        input_box = BoxLayout(orientation='vertical', size_hint=(0.9, None), height=100, pos_hint={'center_x': 0.5, },
                               padding=[10, 10], spacing=5)
 
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
