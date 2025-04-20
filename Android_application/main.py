@@ -43,7 +43,7 @@ class SenseMate(App):
         self.window.add_widget(input_box)
 
         # Take Image Button
-        self.scan_button = Button(text="TAKE AN IMAGE", size_hint=(0.5, 0.15),
+        self.scan_button = Button(text="START IMAGE CAPTURE", size_hint=(0.5, 0.15),
                                   pos_hint={'center_x': 0.5}, bold=True,
                                   background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
         self.scan_button.bind(on_press=self.save_image)
@@ -111,6 +111,7 @@ class SenseMate(App):
 
     def save_image_routine(self):
         while self.control_value:
+            # print("Thread is running...")
             ip = self.txt_input.text.strip()
             if not ip:
                 self.notify("SenseMate", "Enter a valid ESP IP address!")
@@ -138,14 +139,17 @@ class SenseMate(App):
                 except Exception as e:
                     print(f"Error saving image: {e}")
             time.sleep(2)
+        # print("Thread is no longer running...")
         return
 
     def save_image(self, instance):
         if not self.control_value:
             self.control_value=True
             threading.Thread(target=self.save_image_routine).start()
+            self.scan_button.text="STOP IMAGE CAPTURE"
         else:
             self.control_value=False
+            self.scan_button.text="START IMAGE CAPTURE"
 
 if __name__ == "__main__":
     SenseMate().run()
