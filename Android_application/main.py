@@ -1,3 +1,5 @@
+import threading
+import time
 import os
 import requests
 import datetime
@@ -8,7 +10,6 @@ from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from plyer import notification
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
@@ -17,7 +18,7 @@ if platform == "android":
 
 
 class SenseMate(App):
-
+    control_value=False
     def build(self):
         self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5})
 
@@ -108,8 +109,8 @@ class SenseMate(App):
             except Exception as e:
                 print(f"[Android Notification Error]: {e}")
 
-    def save_image(self, instance):
-        while True:
+    def save_image_routine(self):
+        while self.control_value:
             ip = self.txt_input.text.strip()
             if not ip:
                 self.notify("SenseMate", "Enter a valid ESP IP address!")
@@ -129,13 +130,22 @@ class SenseMate(App):
                             for chunk in response.iter_content(1024):
                                 file.write(chunk)
                         ss = SharedStorage()
-                        ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                        ss.copy_to_shared(save_path,
+                                          filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
                         self.notify("SenseMate", "Image Captured")
                     else:
                         print("Failed to download image. Status:", response.status_code)
                 except Exception as e:
                     print(f"Error saving image: {e}")
+            time.sleep(2)
+        return
 
+    def save_image(self, instance):
+        if not self.control_value:
+            self.control_value=True
+            threading.Thread(target=self.save_image_routine).start()
+        else:
+            self.control_value=False
 
 if __name__ == "__main__":
     SenseMate().run()
