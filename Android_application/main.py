@@ -107,42 +107,34 @@ class SenseMate(App):
                 notification_service.notify(1, builder.build())
             except Exception as e:
                 print(f"[Android Notification Error]: {e}")
-        else:
-            try:
-                notification.notify(
-                    title=title,
-                    message=message,
-                    timeout=5  # duration in seconds
-                )
-            except Exception as e:
-                print(f"[Desktop Notification Error]: {e}")
 
     def save_image(self, instance):
-        ip = self.txt_input.text.strip()
-        if not ip:
-            self.notify("SenseMate", "Enter a valid ESP IP address!")
-            return
-        image_url = "http://" + ip
-        print("URL pointing to the ESP32:", image_url)
-        if platform == "android":
-            try:
-                pythonActivity = autoclass("org.kivy.android.PythonActivity")
-                app_context = pythonActivity.mActivity.getApplicationContext()
-                private_dir = app_context.getFilesDir().getAbsolutePath()
-                os.makedirs(private_dir, exist_ok=True)
-                save_path = os.path.join(private_dir, "downloaded_image.jpg")
-                response = requests.get(image_url, stream=True)
-                if response.status_code == 200:
-                    with open(save_path, "wb") as file:
-                        for chunk in response.iter_content(1024):
-                            file.write(chunk)
-                    ss = SharedStorage()
-                    ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
-                    self.notify("SenseMate", "Image Captured")
-                else:
-                    print("Failed to download image. Status:", response.status_code)
-            except Exception as e:
-                print(f"Error saving image: {e}")
+        while True:
+            ip = self.txt_input.text.strip()
+            if not ip:
+                self.notify("SenseMate", "Enter a valid ESP IP address!")
+                return
+            image_url = "http://" + ip
+            print("URL pointing to the ESP32:", image_url)
+            if platform == "android":
+                try:
+                    pythonActivity = autoclass("org.kivy.android.PythonActivity")
+                    app_context = pythonActivity.mActivity.getApplicationContext()
+                    private_dir = app_context.getFilesDir().getAbsolutePath()
+                    os.makedirs(private_dir, exist_ok=True)
+                    save_path = os.path.join(private_dir, "downloaded_image.jpg")
+                    response = requests.get(image_url, stream=True)
+                    if response.status_code == 200:
+                        with open(save_path, "wb") as file:
+                            for chunk in response.iter_content(1024):
+                                file.write(chunk)
+                        ss = SharedStorage()
+                        ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                        self.notify("SenseMate", "Image Captured")
+                    else:
+                        print("Failed to download image. Status:", response.status_code)
+                except Exception as e:
+                    print(f"Error saving image: {e}")
 
 
 if __name__ == "__main__":
