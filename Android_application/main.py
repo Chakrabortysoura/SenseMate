@@ -1,101 +1,68 @@
 import os
 import requests
+import datetime
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.image import Image as widget_image
 from kivy.utils import platform
 from kivy.uix.textinput import TextInput
-from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-import datetime
+from plyer import notification
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
+    from jnius import autoclass, cast
+
 
 class SenseMate(App):
 
     def build(self):
-        self.window = GridLayout()
-        self.window.cols = 1
-        self.window.size_hint = (0.8, 0.9)  # More screen coverage, better fit
-        self.window.pos_hint = {"center_x": 0.5, "center_y": 0.5}
+        self.window = GridLayout(cols=1, size_hint=(0.8, 0.9), pos_hint={"center_x": 0.5, "center_y": 0.5})
 
-        # Background color update
+        # Robotic Theme Background
         self.window.canvas.before.clear()
         with self.window.canvas.before:
             from kivy.graphics import Color, Rectangle
-            Color(0.1, 0.1, 0.3, 1)  # Deep blue background
+            Color(0.05, 0.07, 0.1, 1)
             self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
             self.window.bind(pos=self.update_bg, size=self.update_bg)
 
-        # Image widget
         self.window.add_widget(widget_image(source="sensemate.png"))
 
-    #     # Label Widget - Adjusts with Aspect Ratio
-    #     self.txt = Label(
-    # text="All pictures captured are stored in /Downloads/SenseMate/",
-    # font_size='18sp',
-    # color='#EA6191',
-    # halign="center",
-    # size_hint=(0.9, None),  # Responsive width, dynamic height
-    # text_size=(self.window.width * 0.9, None),  # Auto-wrap text
-    # height=50  # Ensures it remains visible
-    # )
-    #     self.window.add_widget(self.txt)
+        # IP Input
+        input_box = BoxLayout(orientation='vertical', size_hint=(0.9, None), height=60, pos_hint={'center_x': 0.5},
+                              padding=[10, 10], spacing=5)
 
-        # Box for TextInput - Bigger & Raised Higher
-        input_box = BoxLayout(
-    orientation='vertical',
-    size_hint=(0.9, None),  # Bigger width
-    height=60,  # Increased height
-    pos_hint={'center_x': 0.5, 'center_y': 0.65},  # Shifted upwards
-    padding=[10, 10],
-    spacing=5
-)
-
-        self.txt_input = TextInput(
-            hint_text="Enter IP address of the ESP",
-            size_hint=(1, 1),  # Uses full box width
-            font_size='18sp',
-            halign="center",
-            background_color=[1, 1, 1, 1],  # White background
-            foreground_color=[0, 0, 0, 1],  # Black text
-        )
-
-        # Add TextInput inside the Box
+        self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
+                                   font_size='18sp', halign="center",
+                                   background_color=[1, 1, 1, 1], foreground_color=[0, 0, 0, 1])
         input_box.add_widget(self.txt_input)
         self.window.add_widget(input_box)
 
-        # Capture Image Button - Raised Higher
-        self.scan_button = Button(
-            text="TAKE AN IMAGE",
-            size_hint=(0.9, 0.15),  # Increased width
-            pos_hint={'center_x': 0.5, 'center_y': 0.55},  # Raised Upwards
-            bold=True,
-            background_color=(0, 0.6, 1, 1),  # Vibrant blue button
-            color=(1, 1, 1, 1),
-            font_size=18
-        )
+        # Take Image Button
+        self.scan_button = Button(text="TAKE AN IMAGE", size_hint=(0.9, 0.15),
+                                  pos_hint={'center_x': 0.5}, bold=True,
+                                  background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
         self.scan_button.bind(on_press=self.save_image)
         self.window.add_widget(self.scan_button)
-        
-        # Additional Button: View Gallery
-        self.gallery_button = Button(
-            text="VIEW GALLERY",
-            size_hint=(1, 0.15),
-            bold=True,
-            background_color=(0.2, 0.7, 0.2, 1),  # Green button
-            color=(1, 1, 1, 1),
-            font_size=18
-        )
+
+        # Gallery Button
+        self.gallery_button = Button(text="VIEW GALLERY", size_hint=(1, 0.15),
+                                     bold=True, background_color=(0.2, 0.7, 0.3, 1),
+                                     color=(1, 1, 1, 1), font_size=18)
         self.window.add_widget(self.gallery_button)
-        
-        # Request permissions on Android
+
         if platform == "android":
-            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
-        
+            request_permissions([
+                Permission.WRITE_EXTERNAL_STORAGE,
+                Permission.READ_EXTERNAL_STORAGE,
+                Permission.INTERNET,
+                Permission.ACCESS_NETWORK_STATE,
+                Permission.VIBRATE
+            ])
+
         return self.window
 
     def update_bg(self, instance, value):
@@ -103,14 +70,60 @@ class SenseMate(App):
         self.bg_rect.size = instance.size
 
     def timestamp_filename(self):
-        """Create timestamped name for the current image to be saved"""
         current_time = str(datetime.datetime.now())
         return current_time[:current_time.rindex('.')].replace(' ', '_') + ".jpg"
 
+    def notify(self, title, message):
+        if platform == 'android':
+            try:
+                PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                Context = autoclass('android.content.Context')
+                NotificationManager = autoclass('android.app.NotificationManager')
+                NotificationChannel = autoclass('android.app.NotificationChannel')
+                NotificationBuilder = autoclass('android.app.Notification$Builder')
+                Build_VERSION = autoclass('android.os.Build$VERSION')
+
+                activity = PythonActivity.mActivity
+                context = cast('android.content.Context', activity.getApplicationContext())
+
+                channel_id = "sensemate_channel"
+                channel_name = "SenseMate Alerts"
+                importance = NotificationManager.IMPORTANCE_HIGH
+                notification_service = cast(NotificationManager, context.getSystemService(Context.NOTIFICATION_SERVICE))
+
+                if Build_VERSION.SDK_INT >= 26:
+                    channel = NotificationChannel(channel_id, channel_name, importance)
+                    channel.setDescription("Channel for SenseMate alerts")
+                    notification_service.createNotificationChannel(channel)
+                    builder = NotificationBuilder(context, channel_id)
+                else:
+                    builder = NotificationBuilder(context)
+
+                builder.setContentTitle(title)
+                builder.setContentText(message)
+                builder.setSmallIcon(activity.getApplicationInfo().icon)
+                builder.setAutoCancel(True)
+
+                notification_service.notify(1, builder.build())
+            except Exception as e:
+                print(f"[Android Notification Error]: {e}")
+        else:
+            try:
+                notification.notify(
+                    title=title,
+                    message=message,
+                    timeout=5  # duration in seconds
+                )
+            except Exception as e:
+                print(f"[Desktop Notification Error]: {e}")
+
     def save_image(self, instance):
-        """ Call the server to retrieve the image capture on ESP32 CAM and Save the image to the phone's local storage """
-        image_url = self.txt_input.text
-        print("Url pointing to the esp32: ", image_url)
+        ip = self.txt_input.text.strip()
+        if not ip:
+            self.notify("SenseMate", "Enter a valid ESP IP address!")
+            return
+        image_url = "http://" + ip
+        print("URL pointing to the ESP32:", image_url)
         if platform == "android":
             try:
                 pythonActivity = autoclass("org.kivy.android.PythonActivity")
@@ -125,10 +138,12 @@ class SenseMate(App):
                             file.write(chunk)
                     ss = SharedStorage()
                     ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                    self.notify("SenseMate", "Image Captured")
                 else:
-                    print("Failed to download the image with status code:", response.status_code)
+                    print("Failed to download image. Status:", response.status_code)
             except Exception as e:
                 print(f"Error saving image: {e}")
+
 
 if __name__ == "__main__":
     SenseMate().run()
