@@ -6,14 +6,9 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image as widget_image
 from kivy.utils import platform
 from kivy.uix.textinput import TextInput
-from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.modalview import ModalView
-from kivy.animation import Animation
-from kivy.clock import Clock
-from kivy.uix.popup import Popup
-from kivy.uix.floatlayout import FloatLayout
+from plyer import notification
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
@@ -75,45 +70,12 @@ class SenseMate(App):
         self.bg_rect.size = instance.size
 
     def timestamp_filename(self):
-        current_time = datetime.datetime.now()
-        return current_time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
-
-    def get_current_timestamp(self):
-        return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    def show_toast(self, title, message):
-        # Desktop/Universal toast-style popup
-        layout = FloatLayout()
-        notif_label = Label(
-            text=f"[b]{title}[/b]\n{message}",
-            markup=True,
-            font_size='16sp',
-            size_hint=(None, None),
-            size=(300, 150),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
-            color=(1, 1, 1, 1)
-        )
-        layout.add_widget(notif_label)
-
-        popup = Popup(
-            title='',
-            content=layout,
-            size_hint=(None, None),
-            size=(350, 160),
-            background_color=(0, 0, 0, 0.8),
-            auto_dismiss=False,
-            separator_height=0
-        )
-
-        popup.open()
-        anim = Animation(opacity=0, duration=0.5)
-        Clock.schedule_once(lambda dt: anim.start(popup), 2)
-        Clock.schedule_once(lambda dt: popup.dismiss(), 2.5)
+        current_time = str(datetime.datetime.now())
+        return current_time[:current_time.rindex('.')].replace(' ', '_') + ".jpg"
 
     def notify(self, title, message):
         if platform == 'android':
             try:
-                from jnius import autoclass, cast
                 PythonActivity = autoclass('org.kivy.android.PythonActivity')
                 Context = autoclass('android.content.Context')
                 NotificationManager = autoclass('android.app.NotificationManager')
@@ -147,7 +109,6 @@ class SenseMate(App):
                 print(f"[Android Notification Error]: {e}")
         else:
             try:
-                from plyer import notification
                 notification.notify(
                     title=title,
                     message=message,
@@ -156,34 +117,13 @@ class SenseMate(App):
             except Exception as e:
                 print(f"[Desktop Notification Error]: {e}")
 
-
-    def show_loading_popup(self, message="Processing..."):
-        self.loading_popup = Popup(
-            title='Please Wait',
-            content=Label(text=message, font_size='16sp', color=[1, 1, 1, 1]),
-            size_hint=(None, None),
-            size=(300, 150),
-            auto_dismiss=False,
-            background_color=(0.1, 0.1, 0.1, 0.9)
-        )
-        self.loading_popup.open()
-
-    def hide_loading_popup(self):
-        if hasattr(self, 'loading_popup') and self.loading_popup:
-            self.loading_popup.dismiss()
-
     def save_image(self, instance):
         ip = self.txt_input.text.strip()
         if not ip:
             self.notify("SenseMate", "Enter a valid ESP IP address!")
             return
-
-        self.notify("SenseMate", f"Capturing image at {self.get_current_timestamp()}")
-        self.show_loading_popup("Capturing image from ESP...")
-
         image_url = "http://" + ip
         print("URL pointing to the ESP32:", image_url)
-
         if platform == "android":
             try:
                 pythonActivity = autoclass("org.kivy.android.PythonActivity")
@@ -191,24 +131,18 @@ class SenseMate(App):
                 private_dir = app_context.getFilesDir().getAbsolutePath()
                 os.makedirs(private_dir, exist_ok=True)
                 save_path = os.path.join(private_dir, "downloaded_image.jpg")
-
                 response = requests.get(image_url, stream=True)
                 if response.status_code == 200:
                     with open(save_path, "wb") as file:
                         for chunk in response.iter_content(1024):
                             file.write(chunk)
-
                     ss = SharedStorage()
                     ss.copy_to_shared(save_path, filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                    self.notify("SenseMate", "Image Captured")
                 else:
                     print("Failed to download image. Status:", response.status_code)
             except Exception as e:
                 print(f"Error saving image: {e}")
-        else:
-            # For desktop simulation, just simulate download
-            print(f"[SIMULATION] Image downloaded from: {image_url}")
-
-        Clock.schedule_once(lambda dt: self.hide_loading_popup(), 2)
 
 
 if __name__ == "__main__":
