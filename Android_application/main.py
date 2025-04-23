@@ -111,7 +111,6 @@ class SenseMate(App):
 
     def save_image_routine(self):
         while self.control_value:
-            # print("Thread is running...")
             ip = self.txt_input.text.strip()
             if not ip:
                 self.notify("SenseMate", "Enter a valid ESP IP address!")
@@ -131,25 +130,23 @@ class SenseMate(App):
                             for chunk in response.iter_content(1024):
                                 file.write(chunk)
                         ss = SharedStorage()
-                        ss.copy_to_shared(save_path,
-                                          filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
+                        ss.copy_to_shared(save_path,filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
                         self.notify("SenseMate", "Image Captured")
                     else:
-                        print("Failed to download image. Status:", response.status_code)
+                        self.notify("SenseMate", "Device is not found on the address")
                 except Exception as e:
-                    print(f"Error saving image: {e}")
-            time.sleep(2)
-        # print("Thread is no longer running...")
+                    self.notify("SenseMate", "Some unexpected error encoutered")
+            time.sleep(4)
         return
 
     def save_image(self, instance):
         if not self.control_value:
             self.control_value=True
             threading.Thread(target=self.save_image_routine).start()
-            self.scan_button.text="STOP IMAGE CAPTURE"
+            self.scan_button.text="STOP CAPTURE"
         else:
             self.control_value=False
-            self.scan_button.text="START IMAGE CAPTURE"
+            self.scan_button.text="START CAPTURE"
 
 if __name__ == "__main__":
     SenseMate().run()
