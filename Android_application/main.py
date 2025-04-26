@@ -20,7 +20,7 @@ if platform == "android":
 class SenseMate(App):
     control_value=False
     def build(self):
-        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5})
+        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,50,20,200],spacing=50)
 
         # Robotic Theme Background
         self.window.canvas.before.clear()
@@ -30,7 +30,7 @@ class SenseMate(App):
             self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
             self.window.bind(pos=self.update_bg, size=self.update_bg)
 
-        self.window.add_widget(widget_image(source="sensemate.png"))
+        self.window.add_widget(widget_image(source="sensemate.png",size_hint=(0.5, None)))
 
         # IP Input
         input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5, },
@@ -43,14 +43,14 @@ class SenseMate(App):
         self.window.add_widget(input_box)
 
         # Take Image Button
-        self.scan_button = Button(text="START IMAGE CAPTURE", size_hint=(0.5, 0.15),
+        self.scan_button = Button(text="START IMAGE CAPTURE", size_hint=(0.5, 0.05),
                                   pos_hint={'center_x': 0.5}, bold=True,
                                   background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
         self.scan_button.bind(on_press=self.save_image)
         self.window.add_widget(self.scan_button)
 
         # Gallery Button
-        self.gallery_button = Button(text="VIEW GALLERY", size_hint=(1, 0.15),
+        self.gallery_button = Button(text="VIEW GALLERY", size_hint=(1, 0.05),padding =[20,200],
                                      bold=True, background_color=(0.2, 0.7, 0.3, 1),
                                      color=(1, 1, 1, 1), font_size=18)
         self.window.add_widget(self.gallery_button)
