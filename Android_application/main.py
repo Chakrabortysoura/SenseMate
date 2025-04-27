@@ -10,8 +10,8 @@ from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.graphics import Color, RoundedRectangle
-
+#from kivy.graphics import Color, RoundedRectangle
+import kivy.utils
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
@@ -28,7 +28,7 @@ class SenseMate(App):
         self.window.canvas.before.clear()
         with self.window.canvas.before:
             from kivy.graphics import Color, Rectangle
-            Color(0.05, 0.07, 0.1, 1)
+            Color(8/255, 16/255, 22/255, 1)
             self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
             self.window.bind(pos=self.update_bg, size=self.update_bg)
 
@@ -46,16 +46,22 @@ class SenseMate(App):
 
         # Take Image Button
         self.scan_button = Button(text="START IMAGE CAPTURE", size_hint=(0.5, 0.005),
-                                  pos_hint={'center_x': 0.5}, bold=True, background_normal='',
-                                  background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
+                                  pos_hint={'center_x': 0.5},
+                                  bold=True, 
+                                  background_normal='',
+                                  background_color=(kivy.utils.get_color_from_hex("#D1FDB2")), 
+                                  color=(0.2, 0.2, 0.2, 1), 
+                                  font_size=30,)
         self.scan_button.bind(on_press=self.save_image)
 #        self.scan_button.bind(pos=self.update_scan_button, size=self.update_scan_button)
         self.window.add_widget(self.scan_button)
 
         # Gallery Button
         self.gallery_button = Button(text="VIEW GALLERY", size_hint=(1, 0.005),padding =[20,200],
-                                     bold=True, background_normal='', background_color=(0.2, 0.7, 0.3, 1),
-                                     color=(1, 1, 1, 1), font_size=18)
+                                     bold=True, background_normal='', 
+                                     #background_color=(0.2, 0.4, 0.6, 1),
+                                     background_color=(kivy.utils.get_color_from_hex("#e53788")),
+                                     color=(1, 1, 1, 1), font_size=30)
         self.window.add_widget(self.gallery_button)
 #        self.gallery_button.bind(pos=self.update_gallery_button, size=self.update_gallery_button)
 
