@@ -10,6 +10,8 @@ from kivy.utils import platform
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.graphics import Color, RoundedRectangle
+
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
@@ -44,16 +46,18 @@ class SenseMate(App):
 
         # Take Image Button
         self.scan_button = Button(text="START IMAGE CAPTURE", size_hint=(0.5, 0.005),
-                                  pos_hint={'center_x': 0.5}, bold=True,
+                                  pos_hint={'center_x': 0.5}, bold=True, background_normal='',
                                   background_color=(0.2, 0.8, 1, 1), color=(1, 1, 1, 1), font_size=18)
         self.scan_button.bind(on_press=self.save_image)
+#        self.scan_button.bind(pos=self.update_scan_button, size=self.update_scan_button)
         self.window.add_widget(self.scan_button)
 
         # Gallery Button
         self.gallery_button = Button(text="VIEW GALLERY", size_hint=(1, 0.005),padding =[20,200],
-                                     bold=True, background_color=(0.2, 0.7, 0.3, 1),
+                                     bold=True, background_normal='', background_color=(0.2, 0.7, 0.3, 1),
                                      color=(1, 1, 1, 1), font_size=18)
         self.window.add_widget(self.gallery_button)
+#        self.gallery_button.bind(pos=self.update_gallery_button, size=self.update_gallery_button)
 
         if platform == "android":
             request_permissions([
@@ -65,6 +69,21 @@ class SenseMate(App):
             ])
 
         return self.window
+    
+
+# Rounding corners function, needs more work
+
+#    def update_scan_button(self, instance, value):
+#        instance.canvas.before.clear()
+#        with instance.canvas.before:
+#            Color(0.5, 0.8, 0.1, 1)  # blue color for TAKE AN IMAGE
+#            RoundedRectangle(pos=instance.pos, size=instance.size, radius=[20])  # radius=20 for nice rounding
+
+#    def update_gallery_button(self, instance, value):
+#        instance.canvas.before.clear()
+#        with instance.canvas.before:
+#            Color(0.5, 0.7, 0.1, 1)  # green color for VIEW GALLERY
+#            RoundedRectangle(pos=instance.pos, size=instance.size, radius=[20])
 
     def update_bg(self, instance, value):
         self.bg_rect.pos = instance.pos
