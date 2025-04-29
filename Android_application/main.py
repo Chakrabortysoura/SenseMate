@@ -32,15 +32,17 @@ class SenseMate(App):
             self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
             self.window.bind(pos=self.update_bg, size=self.update_bg)
 
-        self.window.add_widget(widget_image(source="sensemate.png",size_hint=(0.5, None)))
+        self.window.add_widget(widget_image(source="sensemate.png",size_hint=(1.5, 1.5)))
 
         # IP Input
         input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5, },
                               padding=[50, 10], spacing=5)
 
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
-                                   font_size='18sp', halign="center",
-                                   background_color=[1, 1, 1, 1], foreground_color=[0, 0, 0, 1])
+                                   font_size='35sp', 
+                                   halign="center",
+                                   background_color=[1, 1, 1, 1], 
+                                   foreground_color=[0, 0, 0, 1])
         input_box.add_widget(self.txt_input)
         self.window.add_widget(input_box)
 
@@ -48,12 +50,12 @@ class SenseMate(App):
         scan_button_box = BoxLayout(size_hint=(1, None), height=90, padding=[0, 10])
         self.scan_button = Button(text="START IMAGE CAPTURE", 
                                   size_hint=(0.8, None),
-                                  height=80,
+                                  height=120,
                                   pos_hint={'center_x': 0.5},
                                   bold=True, 
                                   background_normal='',
-                                  background_color=(kivy.utils.get_color_from_hex("#D1FDB2")), 
-                                  color=(0.2, 0.2, 0.2, 1), 
+                                  background_color=(kivy.utils.get_color_from_hex("#42FF3EFF")), 
+                                  color=(kivy.utils.get_color_from_hex("#391F34FF")), 
                                   font_size=45)
 
 #        with self.scan_button.canvas.before:
@@ -70,11 +72,11 @@ class SenseMate(App):
         gallery_button_box = BoxLayout(size_hint=(1, None), height=90, padding=[0, 10])
         self.gallery_button = Button(text="VIEW GALLERY", 
                                      size_hint=(0.8, None),
-                                     height=80,
+                                     height=120,
                                      bold=True, 
                                      background_normal='', 
-                                     background_color=(kivy.utils.get_color_from_hex("#e53788")),
-                                     color=(1, 1, 1, 1), 
+                                     background_color=(kivy.utils.get_color_from_hex("#FFF826FF")),
+                                     color=(kivy.utils.get_color_from_hex("#0B2C39FF")), 
                                      font_size=45)
 
 #        with self.gallery_button.canvas.before:
@@ -82,7 +84,7 @@ class SenseMate(App):
 #            self.gallery_rect = RoundedRectangle(size=self.gallery_button.size, pos=self.gallery_button.pos, radius=[20])
 #        self.gallery_button.bind(pos=self.update_gallery_button, size=self.update_gallery_button)
 
- #       self.window.add_widget(self.gallery_button)
+#        self.window.add_widget(self.gallery_button)
         gallery_button_box.add_widget(self.gallery_button)
         self.window.add_widget(gallery_button_box)
 
