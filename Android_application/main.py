@@ -59,17 +59,11 @@ class SenseMate(App):
                                   color=(kivy.utils.get_color_from_hex("#391F34FF")), 
                                   font_size=45)
 
-#        with self.scan_button.canvas.before:
-#            Color(0.2, 0.8, 1, 1)
-#            self.scan_rect = RoundedRectangle(size=self.scan_button.size, pos=self.scan_button.pos, radius=[20])
-#        self.scan_button.bind(pos=self.update_scan_button, size=self.update_scan_button)
 
         self.scan_button.bind(on_press=self.save_image)
         scan_button_box.add_widget(self.scan_button)
         self.window.add_widget(scan_button_box)
-        #self.window.add_widget(self.scan_button)
 
-        # Gallery Button
         gallery_button_box = BoxLayout(size_hint=(1, None), height=90, padding=[0, 10])
         self.gallery_button = Button(text="VIEW GALLERY", 
                                      size_hint=(0.8, None),
@@ -80,12 +74,7 @@ class SenseMate(App):
                                      color=(kivy.utils.get_color_from_hex("#0B2C39FF")), 
                                      font_size=45)
 
-#        with self.gallery_button.canvas.before:
-#            Color(0.2, 0.7, 0.3, 1)
-#            self.gallery_rect = RoundedRectangle(size=self.gallery_button.size, pos=self.gallery_button.pos, radius=[20])
-#        self.gallery_button.bind(pos=self.update_gallery_button, size=self.update_gallery_button)
 
-#        self.window.add_widget(self.gallery_button)
         gallery_button_box.add_widget(self.gallery_button)
         self.window.add_widget(gallery_button_box)
 
@@ -100,20 +89,6 @@ class SenseMate(App):
 
         return self.window
     
-
-# Rounding corners function, needs more work
-
-#    def update_scan_button(self, instance, value):
-#        instance.canvas.before.clear()
-#        with instance.canvas.before:
-#            Color(0.5, 0.8, 0.1, 1)  # blue color for TAKE AN IMAGE
-#            RoundedRectangle(pos=instance.pos, size=instance.size, radius=[20])  # radius=20 for nice rounding
-
-#    def update_gallery_button(self, instance, value):
-#        instance.canvas.before.clear()
-#        with instance.canvas.before:
-#            Color(0.5, 0.7, 0.1, 1)  # green color for VIEW GALLERY
-#            RoundedRectangle(pos=instance.pos, size=instance.size, radius=[20])
 
     def update_bg(self, instance, value):
         self.bg_rect.pos = instance.pos
