@@ -22,7 +22,7 @@ if platform == "android":
 class SenseMate(App):
     control_value=False
     def build(self):
-        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,50,20,200],spacing=50)
+        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,50,20,200],spacing=80)
 
         # Robotic Theme Background
         self.window.canvas.before.clear()
@@ -35,7 +35,7 @@ class SenseMate(App):
         self.window.add_widget(widget_image(source="sensemate.png",size_hint=(1.5, 1.5)))
 
         # IP Input
-        input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5, },
+        input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5 },
                               padding=[50, 10], spacing=5)
 
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
