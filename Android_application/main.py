@@ -11,7 +11,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 import cv2
-from model import TensorFlowModel
+#from model import TensorFlowModel
 import numpy as np
 import kivy.utils
 
@@ -24,7 +24,7 @@ if platform == "android":
 class SenseMate(App):
     control_value=False
     def build(self):
-        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,50,20,200],spacing=80) # spacing determines the space between the objects
+        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],spacing=100) # spacing determines the space between the objects
 
         # Robotic Theme Background
         self.window.canvas.before.clear()
@@ -34,11 +34,11 @@ class SenseMate(App):
             self.bg_rect = Rectangle(pos=self.window.pos, size=self.window.size)
             self.window.bind(pos=self.update_bg, size=self.update_bg)
 
-        self.window.add_widget(widget_image(source="sensemate.png",size_hint=(1.5, 1.5)))
+        self.window.add_widget(widget_image(source="sensemate.png",size_hint=(2,2)))
 
         # IP Input
         input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=100, pos_hint={'center_x': 0.5 },
-                              padding=[50, 10], spacing=5)
+                              padding=[50, 20], spacing=20)
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
                                    font_size='35sp', 
                                    halign="center",
@@ -173,14 +173,14 @@ class SenseMate(App):
             self.scan_button.text="START CAPTURE"
 
 if __name__ == "__main__":
-    litemodel=TensorFlowModel()
-    litemodel.load(os.getcwd()+"/model1.tflite")
+#    litemodel=TensorFlowModel()
+#    litemodel.load(os.getcwd()+"/model1.tflite")
 
-    img=cv2.imread(os.getcwd()+"/img_2795.jpg")
-    img=cv2.resize(img,(150,150))
-    img=img.astype(np.float32)/255.0
+#    img=cv2.imread(os.getcwd()+"/img_2795.jpg")
+#    img=cv2.resize(img,(150,150))
+#    img=img.astype(np.float32)/255.0
 
-    result=litemodel.pred(img)
-    print("Result of the Inference : ", np.round(result[0][0]))
+#    result=litemodel.pred(img)
+#    print("Result of the Inference : ", np.round(result[0][0]))
 
     SenseMate().run()
