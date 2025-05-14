@@ -11,11 +11,11 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 import cv2
-from model import TensorFlowModel
 import numpy as np
 import kivy.utils
 
 if platform == "android":
+    from model import TensorFlowModel
     from android.permissions import request_permissions, Permission
     from androidstorage4kivy import SharedStorage
     from jnius import autoclass, cast
@@ -24,10 +24,11 @@ if platform == "android":
 class SenseMate(App):
     control_value=False
     def build(self):
-        self.litemodel=TensorFlowModel()
-        self.litemodel.load(os.getcwd()+"/model1.tflite")
+        if platform == 'android':
+            self.litemodel=TensorFlowModel()
+            self.litemodel.load(os.getcwd()+"/model1.tflite")
 
-        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],spacing=100) # spacing determines the space between the objects
+        self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],height=200,spacing=100) # spacing determines the space between the objects
 
         # Robotic Theme Background
         self.window.canvas.before.clear()
@@ -40,7 +41,7 @@ class SenseMate(App):
         self.window.add_widget(widget_image(source="sensemate.png",size_hint=(2,2)))
 
         # IP Input
-        input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=120, pos_hint={'center_x': 0.5 },
+        input_box = BoxLayout(orientation='vertical', size_hint=(0.5, None), height=180, pos_hint={'center_x': 0.5 },
                               padding=[50, 20], spacing=20)
         self.txt_input = TextInput(hint_text="Enter IP address of the ESP", size_hint=(1, 1),
                                    font_size='35sp', 
