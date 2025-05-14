@@ -11,7 +11,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 import cv2
-#from model import TensorFlowModel
+from model import TensorFlowModel
 import numpy as np
 import kivy.utils
 
@@ -24,6 +24,9 @@ if platform == "android":
 class SenseMate(App):
     control_value=False
     def build(self):
+        self.litemodel=TensorFlowModel()
+        self.litemodel.load(os.getcwd()+"/model1.tflite")
+
         self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],spacing=100) # spacing determines the space between the objects
 
         # Robotic Theme Background
@@ -151,11 +154,16 @@ class SenseMate(App):
                     response = requests.get(image_url, stream=True)
                     if response.status_code == 200:
                         with open(save_path, "wb") as file:
+                            image=cv2.imread(response.content)
+                            image = cv2.resize(image, (150, 150)).astype(np.float32)/255.0
+                            result= self.litemodel.pred(image)
+                            if np.round(result[[0]]) ==0 :
+                               self.notify("SenseMate", "Person Detected")
                             for chunk in response.iter_content(1024):
                                 file.write(chunk)
                         ss = SharedStorage()
                         ss.copy_to_shared(save_path,filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
-                        self.notify("SenseMate", "Image Captured")
+                        # self.notify("SenseMate", "Image Captured")
                     else:
                         self.notify("SenseMate", "Device is not found on the address")
                 except Exception as e:
@@ -173,14 +181,4 @@ class SenseMate(App):
             self.scan_button.text="START CAPTURE"
 
 if __name__ == "__main__":
-#    litemodel=TensorFlowModel()
-#    litemodel.load(os.getcwd()+"/model1.tflite")
-
-#    img=cv2.imread(os.getcwd()+"/img_2795.jpg")
-#    img=cv2.resize(img,(150,150))
-#    img=img.astype(np.float32)/255.0
-
-#    result=litemodel.pred(img)
-#    print("Result of the Inference : ", np.round(result[0][0]))
-
     SenseMate().run()
