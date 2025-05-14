@@ -153,17 +153,19 @@ class SenseMate(App):
                     save_path = os.path.join(private_dir, "downloaded_image.jpg")
                     response = requests.get(image_url, stream=True)
                     if response.status_code == 200:
+                        # image=np.frombuffer(response.content, np.uint8)
+                        # image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+                        # image = cv2.resize(image, (150, 150))
+                        # image=image.astype(np.float32)/255.0
+                        # result= self.litemodel.pred(image)
+                        # if np.round(result[[0]]) ==0 :
+                        #    self.notify("SenseMate", "Person Detected")
                         with open(save_path, "wb") as file:
-                            image=cv2.imread(response.content)
-                            image = cv2.resize(image, (150, 150)).astype(np.float32)/255.0
-                            result= self.litemodel.pred(image)
-                            if np.round(result[[0]]) ==0 :
-                               self.notify("SenseMate", "Person Detected")
                             for chunk in response.iter_content(1024):
                                 file.write(chunk)
                         ss = SharedStorage()
                         ss.copy_to_shared(save_path,filepath="/storage/emulated/0/SenseMate/records/" + self.timestamp_filename())
-                        # self.notify("SenseMate", "Image Captured")
+                        self.notify("SenseMate", "Image Captured")
                     else:
                         self.notify("SenseMate", "Device is not found on the address")
                 except Exception as e:
