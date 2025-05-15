@@ -11,6 +11,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 import cv2
+import cv2.data
 import numpy as np
 import kivy.utils
 
@@ -28,6 +29,7 @@ class SenseMate(App):
             self.litemodel=TensorFlowModel()
             self.litemodel.load(os.getcwd()+"/model1.tflite")
 
+        self.classifier=cv2.CascadeClassifier(cv2.data.haarcascades+'haarcascade_frontalface_default.xml')
         self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],height=200,spacing=100) # spacing determines the space between the objects
 
         # Robotic Theme Background
