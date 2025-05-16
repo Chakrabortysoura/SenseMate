@@ -11,7 +11,6 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 import cv2
-import cv2.data
 import numpy as np
 import kivy.utils
 
@@ -21,7 +20,6 @@ if platform == "android":
     from androidstorage4kivy import SharedStorage
     from jnius import autoclass, cast
 
-
 class SenseMate(App):
     control_value=False
     def build(self):
@@ -29,7 +27,7 @@ class SenseMate(App):
             self.litemodel=TensorFlowModel()
             self.litemodel.load(os.getcwd()+"/model1.tflite")
 
-        self.classifier=cv2.CascadeClassifier(cv2.data.haarcascades+'haarcascade_frontalface_default.xml')
+        # self.classifier=cv2.CascadeClassifier(cv2.data.haarcascades+'haarcascade_frontalface_default.xml')
         self.window = GridLayout(cols=1, size_hint=(1, 1), pos_hint={"center_x": 0.5, "center_y": 0.5}, padding=[20,60,20,200],height=200,spacing=100) # spacing determines the space between the objects
 
         # Robotic Theme Background
@@ -156,13 +154,15 @@ class SenseMate(App):
                     save_path = os.path.join(private_dir, "downloaded_image.jpg")
                     response = requests.get(image_url, stream=True)
                     if response.status_code == 200:
-                        # image=np.frombuffer(response.content, np.uint8)
-                        # image=cv2.imdecode(image, cv2.IMREAD_COLOR)
-                        # image = cv2.resize(image, (150, 150))
-                        # image=image.astype(np.float32)/255.0
-                        # result= self.litemodel.pred(image)
-                        # if np.round(result[[0]]) ==0 :
-                        #    self.notify("SenseMate", "Person Detected")
+                        image=np.frombuffer(response.content, np.uint8)
+                        image=cv2.imdecode(image, cv2.IMREAD_COLOR)
+                        image = cv2.resize(image, (150, 150))
+                        # gray= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                        image=image.astype(np.float32)/255.0
+                        result1= self.litemodel.pred(image)
+                        # result2=self.classifier.detectMultiScale(gray, scaleFactor=1.0, minNeighbours=8)
+                        if np.round(result1[[0]]) ==0:
+                           self.notify("SenseMate", "Possible Person Detected")
                         with open(save_path, "wb") as file:
                             for chunk in response.iter_content(1024):
                                 file.write(chunk)
