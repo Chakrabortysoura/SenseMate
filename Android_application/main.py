@@ -159,9 +159,10 @@ class SenseMate(App):
                         image = cv2.resize(image, (150, 150))
                         # gray= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                         image=image.astype(np.float32)/255.0
-                        result1= self.litemodel.pred(image)
+                        result= self.litemodel.pred(image)
+                        print("prediction result: ", result)
                         # result2=self.classifier.detectMultiScale(gray, scaleFactor=1.0, minNeighbours=8)
-                        if np.round(result1[[0]]) ==0:
+                        if np.round(result[[0]]) ==0:
                            self.notify("SenseMate", "Possible Person Detected")
                         with open(save_path, "wb") as file:
                             for chunk in response.iter_content(1024):
